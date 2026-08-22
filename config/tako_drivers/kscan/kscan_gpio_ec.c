@@ -157,7 +157,6 @@ static void kscan_ec_work_handler(struct k_work *work) {
   struct adc_sequence *adc_seq = &data->adc_seq;
 
   int rc;
-
   int16_t matrix_read[config->rows * config->cols];
 
   /* Power on */
@@ -166,30 +165,26 @@ static void kscan_ec_work_handler(struct k_work *work) {
   /* Wait for everything to power on. */
   k_sleep(K_MSEC(2));
 
-   for (int col = 0; col < config->cols; col++) {
+  for (int col = 0; col < config->cols; col++) {
     uint8_t ch = config->col_channels[col];
 
-    // Select mux cleanly
+    // Select mux
     gpio_pin_set_dt(&config->mux_en.spec, 1);
     gpio_pin_set_dt(&config->mux_sels.gpios[0].spec, (ch >> 0) & 1);
     gpio_pin_set_dt(&config->mux_sels.gpios[1].spec, (ch >> 1) & 1);
     gpio_pin_set_dt(&config->mux_sels.gpios[2].spec, (ch >> 2) & 1);
     gpio_pin_set_dt(&config->mux_en.spec, 0);
 
-    // Give the hardware mux chip time to settle its internal gates
     k_sleep(K_USEC(20));
 
     for (int row = 0; row < config->rows; row++) {
       const int index = state_index_rc(config, row, col);
 
-      // Explicitly ensure this row is dead low before arming the discharge line
       gpio_pin_set_dt(&config->direct.gpios[row].spec, 0);
 
       // --- LOCK ---
       const unsigned int lock = irq_lock();
       gpio_pin_configure_dt(&config->discharge.spec, GPIO_INPUT);
-      
-      // Actively pulse the row HIGH to charge the capacitive pad
       gpio_pin_set_dt(&config->direct.gpios[row].spec, 1);
 
       WAIT_CHARGE();
@@ -204,27 +199,22 @@ static void kscan_ec_work_handler(struct k_work *work) {
         matrix_read[index] = -1;
       }
 
-      /* CRITICAL FIX 1: IMMEDIATELY DROP THE ROW PIN LOW */
-      /* Do not leave it high, otherwise it leaks into the next row's scan window */
+      /* Drop row pin low immediately to isolate charge */
       gpio_pin_set_dt(&config->direct.gpios[row].spec, 0);
 
       irq_unlock(lock);
       // -- END LOCK --
 
-      // Actively drain the matrix track
       gpio_pin_configure_dt(&config->discharge.spec, GPIO_OUTPUT_ACTIVE);
       gpio_pin_set_dt(&config->discharge.spec, 0);
       WAIT_DISCHARGE();
     }
 
-    /* CRITICAL FIX 2: CROSS-COLUMN INTERMISSION DRAIN */
-    /* Force a hard ground clamp on the entire analog rail for 20µs right here */
-    /* to clear any ghost tail charge before moving to the next physical mux column */
+    /* Cross-column ground flush to clear trace capacitance */
     gpio_pin_configure_dt(&config->discharge.spec, GPIO_OUTPUT_ACTIVE);
     gpio_pin_set_dt(&config->discharge.spec, 0);
     k_sleep(K_USEC(20));
   }
-}
 
   /* Power off */
   gpio_pin_set_dt(&config->power.spec, 0);
@@ -272,6 +262,7 @@ static void kscan_ec_work_handler(struct k_work *work) {
     }
   }
 }
+
 
 static int kscan_ec_init(const struct device *dev) {
   LOG_DBG("KSCAN EC init");
