@@ -18,7 +18,7 @@
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define WAIT_CHARGE()
-#define WAIT_DISCHARGE() k_sleep(K_USEC(20));
+#define WAIT_DISCHARGE() k_sleep(K_USEC(60));
 
 #define DT_DRV_COMPAT zmk_kscan_gpio_ec
 
