@@ -176,7 +176,7 @@ static void kscan_ec_work_handler(struct k_work *work) {
     gpio_pin_set_dt(&config->mux_sels.gpios[2].spec, ch & 4);
     gpio_pin_set_dt(&config->mux_en.spec, 0);
 
-    k_sleep(K_USEC(20)):
+    k_sleep(K_USEC(20));
 
     for (int row = 0; row < config->rows; row++) {
       const int index = state_index_rc(config, row, col);
