@@ -18,7 +18,7 @@
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define WAIT_CHARGE()
-#define WAIT_DISCHARGE()
+#define WAIT_DISCHARGE() k_sleep(K_USEC(20));
 
 #define DT_DRV_COMPAT zmk_kscan_gpio_ec
 
@@ -168,7 +168,6 @@ static void kscan_ec_work_handler(struct k_work *work) {
 
   for (int col = 0; col < config->cols; col++) {
     uint8_t ch = config->col_channels[col];
-    printk("COL %d uses mux channel %d\n", col, ch);
 
     // Select mux
     gpio_pin_set_dt(&config->mux_en.spec, 1);
