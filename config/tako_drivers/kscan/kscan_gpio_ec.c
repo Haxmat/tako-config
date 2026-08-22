@@ -38,10 +38,10 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 /* LEFT HAND */
 const uint16_t actuation_threshold[] = {
-    650, 650, 650, 650, 650,
-    650, 650, 650, 650, 650,
-    650, 650, 650, 650, 650,
-    650, 650, 650, 650, 650,
+    800, 800, 800, 800, 800,
+    800, 800, 800, 800, 800,
+    800, 800, 800, 800, 800,
+    800, 800, 800, 800, 800,
 };
 
 const uint16_t release_threshold[] = {
@@ -54,10 +54,10 @@ const uint16_t release_threshold[] = {
 
 /* RIGHT HAND */
 const uint16_t actuation_threshold[] = {
-    650, 650, 650, 650, 650,
-    650, 650, 650, 650, 650,
-    650, 650, 650, 650, 650,
-    650, 650, 650, 650, 650,
+    800, 800, 800, 800, 800,
+    800, 800, 800, 800, 800,
+    800, 800, 800, 800, 800,
+    800, 800, 800, 800, 800,
 };
 
 const uint16_t release_threshold[] = {
