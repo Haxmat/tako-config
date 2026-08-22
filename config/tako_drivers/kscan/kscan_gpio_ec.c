@@ -171,9 +171,9 @@ static void kscan_ec_work_handler(struct k_work *work) {
 
     // Select mux
     gpio_pin_set_dt(&config->mux_en.spec, 1);
-    gpio_pin_set_dt(&config->mux_sels.gpios[0].spec, ch & 1);
-    gpio_pin_set_dt(&config->mux_sels.gpios[1].spec, ch & 2);
-    gpio_pin_set_dt(&config->mux_sels.gpios[2].spec, ch & 4);
+    gpio_pin_set_dt(&config->mux_sels.gpios[0].spec, (ch >> 0) & 1);
+    gpio_pin_set_dt(&config->mux_sels.gpios[1].spec, (ch >> 1) & 1);
+    gpio_pin_set_dt(&config->mux_sels.gpios[2].spec, (ch >> 2) & 1);
     gpio_pin_set_dt(&config->mux_en.spec, 0);
 
     k_sleep(K_USEC(20));
@@ -202,9 +202,10 @@ static void kscan_ec_work_handler(struct k_work *work) {
       irq_unlock(lock);
       // -- END LOCK --
 
-      gpio_pin_set_dt(&config->discharge.spec, 0);
       gpio_pin_configure_dt(&config->discharge.spec, GPIO_OUTPUT);
+      gpio_pin_set_dt(&config->discharge.spec, 0);
       WAIT_DISCHARGE();
+
     }
   }
 
