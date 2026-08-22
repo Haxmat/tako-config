@@ -168,6 +168,7 @@ static void kscan_ec_work_handler(struct k_work *work) {
 
   for (int col = 0; col < config->cols; col++) {
     uint8_t ch = config->col_channels[col];
+    printk("COL %d uses mux channel %d\n", col, ch);
 
     // Select mux
     gpio_pin_set_dt(&config->mux_en.spec, 1);
