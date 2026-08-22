@@ -151,7 +151,22 @@ static void kscan_ec_timer_handler(struct k_timer *timer) {
   k_work_submit(&data->work);
 }
 
-  for (int col = 0; col < config->cols; col++) {
+static void kscan_ec_work_handler(struct k_work *work) {
+  struct kscan_ec_data *data = CONTAINER_OF(work, struct kscan_ec_data, work);
+  const struct kscan_ec_config *config = data->dev->config;
+  struct adc_sequence *adc_seq = &data->adc_seq;
+
+  int rc;
+
+  int16_t matrix_read[config->rows * config->cols];
+
+  /* Power on */
+  gpio_pin_set_dt(&config->power.spec, 1);
+
+  /* Wait for everything to power on. */
+  k_sleep(K_MSEC(2));
+
+   for (int col = 0; col < config->cols; col++) {
     uint8_t ch = config->col_channels[col];
 
     // Select mux cleanly
@@ -209,7 +224,7 @@ static void kscan_ec_timer_handler(struct k_timer *timer) {
     gpio_pin_set_dt(&config->discharge.spec, 0);
     k_sleep(K_USEC(20));
   }
-
+}
 
   /* Power off */
   gpio_pin_set_dt(&config->power.spec, 0);
