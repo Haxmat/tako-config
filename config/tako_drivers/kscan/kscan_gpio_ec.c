@@ -17,8 +17,8 @@
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
-#define WAIT_CHARGE() k_sleep(K_USEC(50))
-#define WAIT_DISCHARGE() k_sleep(K_USEC(50))
+#define WAIT_CHARGE()
+#define WAIT_DISCHARGE()
 
 #define DT_DRV_COMPAT zmk_kscan_gpio_ec
 
@@ -175,6 +175,8 @@ static void kscan_ec_work_handler(struct k_work *work) {
     gpio_pin_set_dt(&config->mux_sels.gpios[1].spec, ch & 2);
     gpio_pin_set_dt(&config->mux_sels.gpios[2].spec, ch & 4);
     gpio_pin_set_dt(&config->mux_en.spec, 0);
+
+    k_sleep(K_USEC(20)):
 
     for (int row = 0; row < config->rows; row++) {
       const int index = state_index_rc(config, row, col);
