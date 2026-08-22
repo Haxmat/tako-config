@@ -18,7 +18,7 @@
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define WAIT_CHARGE()
-#define WAIT_DISCHARGE() k_sleep(K_USEC(60));
+#define WAIT_DISCHARGE() k_busy_wait(25);
 
 #define DT_DRV_COMPAT zmk_kscan_gpio_ec
 
@@ -202,7 +202,7 @@ static void kscan_ec_work_handler(struct k_work *work) {
       irq_unlock(lock);
       // -- END LOCK --
 
-      gpio_pin_configure_dt(&config->discharge.spec, GPIO_OUTPUT);
+      gpio_pin_configure_dt(&config->discharge.spec, GPIO_OUTPUT_ACTIVE);
       gpio_pin_set_dt(&config->discharge.spec, 0);
       WAIT_DISCHARGE();
 
